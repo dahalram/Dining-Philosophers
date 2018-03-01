@@ -5,12 +5,12 @@
 #include <unistd.h>
 
 int n;	// Make the number of philosophers as global variable
-pthread_mutex_t chopsticks[5];
-pthread_t philosophers[5];
+pthread_mutex_t chopsticks[100000];
+pthread_t philosophers[100000];
 
 void think(int philosopher_number) {
 	int sleep_time = rand() % n + 1;
-	printf("Think: philosopher %d thinks for %d time (seconds)\n", philosopher_number, sleep_time);
+	printf("Think: philosopher %d thinks for %d seconds\n", philosopher_number, sleep_time);
 	sleep(sleep_time);
 }
 
@@ -38,14 +38,14 @@ void pickup(int philosopher_number) {
 
 void eat(int philosopher_number) {
 	int sleep_time = rand() %n + 1;
-	printf("Eat: philosopher %d eats for %d time (seconds)\n", philosopher_number, sleep_time);
+	printf("Eat: philosopher %d eats for %d seconds\n", philosopher_number, sleep_time);
 	sleep(sleep_time);
 }
 
 void putdown(int philosopher_number) {
 	printf("Putdown: philosopher %d\n", philosopher_number);
 	pthread_mutex_unlock(&chopsticks[(philosopher_number +1) % n]);
-	pthread_mutex_unlock(&chopsticks[philosopher_number % n]); 
+	pthread_mutex_unlock(&chopsticks[(philosopher_number + n) % n]); 
 }
 
 void *action(void *philosopher_number) {
