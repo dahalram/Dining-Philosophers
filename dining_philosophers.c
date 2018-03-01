@@ -2,40 +2,64 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 int n;	// Make the number of philosophers as global variable
-pthread_mutex_t chopsticks[n];
-pthread_t philosophers[n];
+pthread_mutex_t chopsticks[5];
+pthread_t philosophers[5];
 
-void think(int philo) {
+void think(int philosopher_number) {
 	int sleep_time = rand() % n + 1;
+	printf("Think: philosopher %d thinks for %d time (seconds)\n", philosopher_number, sleep_time);
 	sleep(sleep_time);
 }
 
-void pickup(int philo) {
+void pickup(int philosopher_number) {
+	int left = (philosopher_number + n) % n;
+	int right = (philosopher_number + 1) % n;
+	if (philosopher_number & 1) {
+		printf("Waiting: Philosopher %d is waiting to pickup chopstick %d \n", philosopher_number, right);
+		pthread_mutex_lock(&chopsticks[right]);
+		printf("Picked up: Philosopher %d, Chopstick %d\n", philosopher_number, right);
+		printf("Waiting: Philosopher %d is waiting to pickup chopstick %d \n", philosopher_number, left);
+		pthread_mutex_lock(&chopsticks[left]);
+		printf("Picked up: Philosopher %d, Chopstick %d\n", philosopher_number, left);
+		
+	} else {
+		printf("Waiting: Philosopher %d is waiting to pickup chopstick %d \n", philosopher_number, left);
+		pthread_mutex_lock(&chopsticks[left]);
+		printf("Picked up: Philosopher %d, Chopstick %d\n", philosopher_number, left);
+		printf("Waiting: Philosopher %d is waiting to pickup chopstick %d \n", philosopher_number, right);
+		pthread_mutex_lock(&chopsticks[right]);
+		printf("Picked up: Philosopher %d, Chopstick %d\n", philosopher_number, right);
+	}
 
 }
 
-void eat(int philo) {
+void eat(int philosopher_number) {
 	int sleep_time = rand() %n + 1;
+	printf("Eat: philosopher %d eats for %d time (seconds)\n", philosopher_number, sleep_time);
 	sleep(sleep_time);
 }
 
-void putdown(int philo) {
-	pthread_mutex_unlock(&chopsticks[(philo +1) % n];
-	pthread_mutex_unlock(&chopsticks[philo % n]); 
+void putdown(int philosopher_number) {
+	printf("Putdown: philosopher %d\n", philosopher_number);
+	pthread_mutex_unlock(&chopsticks[(philosopher_number +1) % n]);
+	pthread_mutex_unlock(&chopsticks[philosopher_number % n]); 
 }
 
-void action(void *philo) {
-	think(philo);
-	pickup(philo);
-	eat(philo);
-	putdown(philo);
+void *action(void *philosopher_number) {
+	while (1) {
+		think(philosopher_number);
+		pickup(philosopher_number);
+		eat(philosopher_number);
+		putdown(philosopher_number);
+	}
 }
 
 int main () {
 	// Take number of philosophers as input
-	int n;
+	// int n;
 	printf("Enter number of philosophers: \n");
 	scanf("%d", &n);
 	
@@ -50,7 +74,7 @@ int main () {
 	}
 	
 	for (i = 0; i < n; i++) {
-		pthread_create(&philosophers[i], NULL, action, i);
+		pthread_create(&philosophers[i], NULL, action, (void *)(i));
 	}
 	
 	for (i = 0; i < n; i++) {
