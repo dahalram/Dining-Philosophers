@@ -8,6 +8,7 @@ int n;	// Make the number of philosophers as global variable
 pthread_mutex_t chopsticks[100000];
 pthread_t philosophers[100000];
 
+/* Think for a random time*/
 void think(int philosopher_number) {
 	int sleep_time = rand() % n + 1;
 	printf("Think: philosopher %d thinks for %d seconds\n", philosopher_number, sleep_time);
@@ -36,6 +37,7 @@ void pickup_forks(int philosopher_number) {
 
 }
 
+/* Eat for a random time*/
 void eat(int philosopher_number) {
 	int sleep_time = rand() %n + 1;
 	printf("Eat: philosopher %d eats for %d seconds\n", philosopher_number, sleep_time);
