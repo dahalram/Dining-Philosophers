@@ -14,7 +14,7 @@ void think(int philosopher_number) {
 	sleep(sleep_time);
 }
 
-void pickup(int philosopher_number) {
+void pickup_forks(int philosopher_number) {
 	int left = (philosopher_number + n) % n;
 	int right = (philosopher_number + 1) % n;
 	if (philosopher_number & 1) {
@@ -42,8 +42,8 @@ void eat(int philosopher_number) {
 	sleep(sleep_time);
 }
 
-void putdown(int philosopher_number) {
-	printf("Putdown: philosopher %d\n", philosopher_number);
+void return_forks(int philosopher_number) {
+	printf("Return: philosopher %d\n", philosopher_number);
 	pthread_mutex_unlock(&chopsticks[(philosopher_number +1) % n]);
 	pthread_mutex_unlock(&chopsticks[(philosopher_number + n) % n]); 
 }
@@ -51,9 +51,9 @@ void putdown(int philosopher_number) {
 void *action(void *philosopher_number) {
 	while (1) {
 		think(philosopher_number);
-		pickup(philosopher_number);
+		pickup_forks(philosopher_number);
 		eat(philosopher_number);
-		putdown(philosopher_number);
+		return_forks(philosopher_number);
 	}
 }
 
